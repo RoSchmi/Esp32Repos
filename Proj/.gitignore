@@ -1,0 +1,23 @@
+# .gitignore
+# Erstmal alles ignorieren
+*
+!.gitignore
+
+## Only include this folders
+!/Esp32_WiFiManager_ConfigOnStartUp/
+!/Esp32_WiFiManager_ConfigOnStartUp/**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
