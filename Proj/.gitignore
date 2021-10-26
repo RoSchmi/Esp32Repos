@@ -7,6 +7,9 @@
 !/Esp32_WiFiManager_ConfigOnStartUp/
 !/Esp32_WiFiManager_ConfigOnStartUp/**
 
+!/Esp32_WiFiManager_ConfigOnSwitchFS/
+!/Esp32_WiFiManager_ConfigOnSwitchFS/**
+
 
 
 
