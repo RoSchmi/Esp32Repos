@@ -315,7 +315,7 @@ if (!WiFi.enableSTA(true))
     Serial.println("Stopping Ringtest failed");
   }
 
-  while (true)
+  while (true)   // Stay in loop
   {
     digitalWrite(LED1_PIN, LOW);
     delay(1000);
