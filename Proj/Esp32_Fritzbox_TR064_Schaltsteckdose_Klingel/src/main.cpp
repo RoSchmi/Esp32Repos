@@ -17,7 +17,7 @@
 // --> Zugriff für Anwendungen zulassen --> neu starten
 // --> Usernamen/Passwort angeben (System » FritzBox Benutzer)
 // Benutzereinstellungen: „FRITZBox Einstellungen“ und „Sprachnachrichten, Faxnachrichten, FRITZApp Fon und Anrufliste“ aktivieren.
-// wenn alles richtig, öffne: http://fritz.box:49000/tr64desc.xml
+// wenn alles richtig, öffne zum Test: http://fritz.box:49000/tr64desc.xml
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -61,17 +61,16 @@ const int PORT = 49000;
 TR064 connection(PORT, IP, fuser, fpass);
  
 // Die AIN der DECT!200 Steckdose findet sich im FritzBox Webinterface
-//const String Steckdose1 = "123456 123456";
+// oder auf dem Gerät selbst
+// const String Steckdose1 = "12345 0123456"; (exactly this format - 5 digits, then space, then 7 digits )
 const String Steckdose1 = FRITZ_DEVICE_AIN_01;
 
 // forward declarations
 void ensureWIFIConnection();
 void SetSwitch(String AIN, String state);
 void GetDeviceInfo(String AIN);
-void GetGenericDeviceInfo(String AIN);
 void WahlRundruf();
 void serialEvent();
-
 
 void setup() {
     Serial.begin(115200);
@@ -81,64 +80,40 @@ void setup() {
     // Connect to wifi
     ensureWIFIConnection();
     Serial.println("WIFI connected...");
-
+    
+    // delay is optional
     delay(5000);
 
     // Bei Problemen kann hier die Debug Ausgabe aktiviert werden
     connection.debug_level = DEBUG_VERBOSE;
     
-    connection.init();
-    
-    /*
-while (true)
-    {
-        delay(1000);
-    }
-    */
+    connection.init(); 
 }
  
 void loop() {
-    delay(200);
+    // run functions one time
+    delay(1000);
     GetDeviceInfo(Steckdose1);
-    delay(500);
-    //GetGenericDeviceInfo(Steckdose1);
-    delay(500);
-    Serial.println("Making Wahlrundruf");
-    WahlRundruf();
-
-    GetDeviceInfo(Steckdose1);
-    delay(500);
+    delay(1000);
     SetSwitch(Steckdose1, "ON");
     Serial.println("Switched on");
     delay(20000);
     SetSwitch(Steckdose1, "OFF");
      Serial.println("Switched off");
-    delay(20000);
-
+    delay(5000);
+    GetDeviceInfo(Steckdose1);
+    delay(1000);
+    Serial.println("Wahlrundruf");
+    //WahlRundruf();
 
     while (true)
     {
-        delay(200);
+        delay(3000);
+        Serial.println("Program ended successfully, now infinite loop");
     }
 }
-/*
-    if(Serial.available()) 
-    {
-        Serial.println("Available");
-        delay(500);
-        serialEvent();
-    }
-    else
-    {
-        Serial.println("Not available");
-        delay(500);
-    }
-    
-    delay(20);
-    }
-    */
 
- 
+// not used in this example
 void serialEvent(){
   String inData;
   char inChar;
@@ -182,22 +157,6 @@ void GetDeviceInfo(String AIN) {
     Serial.print(temp, 1);
     Serial.println("*C");
 }
-
-void GetGenericDeviceInfo(String AIN) {
-    ensureWIFIConnection();
-    String paramsb[][2] = {{"NewAIN", AIN}};
-    String reqb[][2] = {{"NewMultimeterPower", ""}, {"NewTemperatureCelsius", ""}};
-    connection.action("urn:dslforum-org:service:X_AVM-DE_Homeauto:1", "GetGenericDeviceInfos", paramsb, 1, reqb, 2);
-    float power = reqb[0][1].toInt() / 100.0;
-    float temp = reqb[1][1].toInt() / 10.0;
-    Serial.print("Stromverbrauch: ");
-    Serial.print(power, 1);
-    Serial.println("W");
-    Serial.print("Temperatur: ");
-    Serial.print(temp, 1);
-    Serial.println("*C");
-}
-
 
   //  Rundruffunktion über TR064 an der Fritzbox auslösen
 void WahlRundruf() {
