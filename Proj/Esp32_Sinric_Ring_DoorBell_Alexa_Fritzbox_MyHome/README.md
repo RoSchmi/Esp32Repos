@@ -1,3 +1,3 @@
-# Esp32_RingDoorBell_Alexa_Sinric_FritzPhone
+# Esp32_Sinric_Ring_Doorbell_Alexa_Fritzbox_MyHome
 
 This is work in progress, not yet valuable for others
