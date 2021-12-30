@@ -16,3 +16,6 @@ Quick example showing how to ring a Fritzbox DECT phone from an Esp32 program
 ### 4) Esp32_Fritzbox_TR064_Schaltsteckdose_Klingel
 Using ESP32 to control a Fritzbox via TR-064 protocol to switch and read sensor values from switchable power socket Fritz!Dect 200
 (based on  -https://github.com/christophreuter/TR-064)
+
+### 5) Esp32_Sinric_Ring_Doorbell_Alexa_Fritzbox_MyHome
+Usees Esp32 to
