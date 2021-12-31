@@ -18,4 +18,5 @@ Using ESP32 to control a Fritzbox via TR-064 protocol to switch and read sensor 
 (based on  -https://github.com/christophreuter/TR-064)
 
 ### 5) Esp32_Sinric_Ring_Doorbell_Alexa_Fritzbox_MyHome
-Usees Esp32 to
+Uses Esp32 to ring Dect phones of a Fritzbox (Router/DECT-Phone combination) when a Ring Video Doorbell Wired is pressed (works together with a cooperation of Ring- and Sinric Pro-Alexa Skills and Alexa Routines).
+Additionally switches Fritz!Dect 200 power socket and monitors energy consumption/generation on the socket.
