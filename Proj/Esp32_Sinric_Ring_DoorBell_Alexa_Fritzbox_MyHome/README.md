@@ -1,15 +1,13 @@
 # Esp32_Sinric_Ring_Doorbell_Alexa_Fritzbox_MyHome
 
-This is work in progress
-
 This is a special application with different functions.
 
 1) Controlling and monitoring of a switchable Fritz!Dect 200 power socket ( for FritzBox ) via Sinric Pro
-2) Ring Dect phones of a Fritzbox (Router/DECT-Phone combination) when a Ring Video Doorbell Wired is pressed (works together with a cooperation of Ring- and Sinric Pro-Alexa Skills and Alexa Routines)
+2) Ringing Dect phones of a Fritzbox (Router/DECT-Phone combination) when a Ring Video Doorbell Wired is pressed (works together with a cooperation of Ring- and Sinric Pro-Alexa Skills and Alexa Routines)
 
 #### To function 1:
 
-This is a quite complex application which can be used to switch a power socket and read the power consumption. The code of this example is good to control one power socket. To use more than one power socket, the code has to be changed at different places (explanations are given in the file main.cpp)
+This is a quite complex application which can be used to switch a power socket and read the power consumption or the power production on the socket when the socket is e.g. connected to the micro converter of a solar panel. The code of this example is good to control one power socket. To use more than one power socket, the code has to be changed at different places (explanations are given in the file main.cpp)
 
 A simple and easier to understand application which can only switch the Fritz!Dect 200 power socket is provided here:
 
@@ -31,6 +29,7 @@ Before you can start:
 Define WiFi-Credentials, FritzBox-Credentials and Sinric Pro Credentials in the file include/config_secrete.h (take 'config_secret_template.h' as a template)
 
 Define 'TRANSPORT_PROTOCOL' (http or https) in file config.h When you begin to work with this App set TRANSPORT_PROTOCOL = 0 (http) The https secured connection will not work before you include the specific certificate of your personal FritzBox in include/config.h. Instructions how to get the certificate are given in the file 'config.h' When you have included the correct certificate, set TRANSPORT_PROTOCOL = 1 More configurations can be made in config.h (details are explained in config.h).
+When you start using the application set 'WORK_WITH_WATCHDOG' to 0. When everthing is working, set 'WORK_WITH_WATCHDOG' to 1.
 
 The FRITZ_DEVICE_AIN can be found on your Fritz!Dect 200 powersocket To get the Sinric Pro Credentials have a look at:
 
