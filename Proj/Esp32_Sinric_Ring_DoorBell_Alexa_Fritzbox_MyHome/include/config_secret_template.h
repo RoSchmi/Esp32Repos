@@ -8,10 +8,10 @@
 #define IOT_CONFIG_WIFI_PASSWORD        "MyPassword"
 
 // FritzBox
-#define FRITZ_IP_ADDRESS "fritz.box"    // IP Address of FritzBox
-                                        // Change for your needs
-#define FRITZ_USER ""                   // FritzBox User (may be empty)
-#define FRITZ_PASSWORD "MySecretName"   // FritzBox Password
+#define FRITZ_IP_ADDRESS "fritz.box"       // IP Address of FritzBox
+                                           // Change for your needs
+#define FRITZ_USER ""                      // FritzBox User (may be empty)
+#define FRITZ_PASSWORD "MySecretPassword"  // FritzBox Password
 
 #define FRITZ_DEVICE_AIN_01 "111122223333" // AIN = Actor ID Numberof Fritz!Dect (12 digit)
 #define FRITZ_DEVICE_AIN_02 ""             

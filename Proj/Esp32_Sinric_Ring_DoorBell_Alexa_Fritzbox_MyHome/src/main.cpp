@@ -1,7 +1,20 @@
 
 // Program 'Esp32_Sinric_Ring_Doorbell_Alexa_Fritzbox_MyHome'
 // Cpoyright RoSchmi 2021, License Apache 2.0
-
+// 
+// Esp32 application to ring Dect phones of a Fritzbox (Router/DECT-Phone combination) 
+// when the 'Ring Video Doorbell Wired' button is pressed 
+// (works in cooperation with Ring- and Sinric Pro-Alexa Skills and Alexa Routines).
+// Additionally switches Fritz!Dect 200 power socket and monitors energy consumption/generation on the socket.
+//
+// What is 
+// The 'Ring Video Doorbell Wired' is a doorbell consisting of ring-button, 
+// video camera with motion detector, microphone and speaker and a WiFi module 
+// to transfere videos to a cloud server of the producer. 
+// There are Apps for iOS and Android phones which connect to the 
+// cloud server and produce a 'ring-sound' when the button is pressed, 
+// can show a video taken from the doorbell camera and provide a talk-back 
+// functionality to talk with the visitor at the door remotely
 // 
 // What is Sinric Pro?
 // Sinric Pro is an internet based ecosystem mainly consisting of a cloud 
@@ -17,11 +30,7 @@
 // Ehternet) with a DECT telefone system. 'FritzBox'es are very popular in
 // Germany.
 // 
-// This App accomplishes a way to switch the power socket remotely over the
-// internet from a Sinric Pro Phone App via the Sinric Pro cloud service and the
-// FritzBox Router/DECT-Phone device. The power consumption at the socket can be 
-// measured remotely as well.
-
+// 
 // Before you can start:
 // Define WiFi-Credentials, FritzBox-Credentials and Sinric Pro Credentials
 // in file 'config_secrete.h' (take 'config_secret_template.h' as a template)
@@ -100,6 +109,8 @@ typedef struct
    bool lastState = true;
 }ButtonState;
 
+int debug_level = SELECTED_DEBUG_LEVEL; ///< Available levels are `DEBUG_NONE`, `DEBUG_ERROR`, `DEBUG_WARNING`, `DEBUG_INFO`, and `DEBUG_VERBOSE`.
+
 //RoSchmi
 #define GPIOPin_16 16    // only used for debugging
 #define GPIOPin 0
@@ -169,7 +180,6 @@ FritzApi fritz((char *)FRITZ_USER, (char *)FRITZ_PASSWORD, FRITZ_IP_ADDRESS, pro
 // forward declaration
 bool sendThisPowerSensorData(RsPowerMeasureMgr &powerMeasureMgr);
 
-
 bool sendPowerSensorData() {
   bool returnResult = false;
   // Change_here_for_more_power_sockets
@@ -179,6 +189,8 @@ bool sendPowerSensorData() {
 }
 
 // forward declarations
+void deb_print(String message, int level);
+void deb_println(String message, int level);
 void print_reset_reason(RESET_REASON reason);
 bool onPowerState(String deviceId, bool &state);
 bool onPowerState1(const String &deviceId, bool state);
@@ -204,24 +216,27 @@ void setup()
   {
     delay(10);
   }
+
+  deb_println(F("\r\nStarting"), DEBUG_NONE);
+
   //RoSchmi
-  Serial.println("\r\nStarting");
-  
-  resetReason_0 = rtc_get_reset_reason(0);
-  resetReason_1 = rtc_get_reset_reason(1);
-  lastResetCause = resetReason_1;
-  Serial.printf("Last Reset Reason: CPU_0 = %u, CPU_1 = %u\r\n", resetReason_0, resetReason_1);
-  Serial.println("Reason CPU_0: ");
-  print_reset_reason(resetReason_0);
-  Serial.println("Reason CPU_1: ");
-  print_reset_reason(resetReason_1);
+  if (debug_level >= DEBUG_INFO)
+  {
+    resetReason_0 = rtc_get_reset_reason(0);
+    resetReason_1 = rtc_get_reset_reason(1);
+    lastResetCause = resetReason_1;
+    Serial.printf("Last Reset Reason: CPU_0 = %u, CPU_1 = %u\r\n", resetReason_0, resetReason_1);
+    Serial.print("Reason CPU_0: ");
+    print_reset_reason(resetReason_0);
+    Serial.print("Reason CPU_1: ");
+    print_reset_reason(resetReason_1);
+  }
 
   delay(3000);
-
-  Serial.print(F("\nStarting ConnectWPA on "));
-  Serial.print(BOARD_NAME);
-  Serial.print(F(" with "));
-  Serial.println(SHIELD_TYPE); 
+  deb_print(F("\nStarting ConnectWPA on "), DEBUG_NONE); 
+  deb_print(BOARD_NAME, DEBUG_NONE); 
+  deb_print(F(" with "), DEBUG_NONE);
+  deb_println(SHIELD_TYPE, DEBUG_NONE);
   
   // Wait some time (3000 ms)
   start = millis();
@@ -234,11 +249,11 @@ void setup()
   // Start watchdog with 20 seconds
   if (esp_task_wdt_init(20, true) == ESP_OK)
   {
-    Serial.println(F("Watchdog enabled with interval of 20 sec"));
+    deb_println(F("Watchdog enabled with interval of 20 sec"), DEBUG_NONE);
   }
   else
   {
-    Serial.println(F("Failed to enable watchdog"));
+    deb_println(F("Failed to enable watchdog"), DEBUG_ERROR);
   }
   esp_task_wdt_add(NULL);
 
@@ -249,7 +264,7 @@ void setup()
 
   //Set WiFi to station mode and disconnect from an AP if it was previously connected
   WiFi.mode(WIFI_STA);
-  Serial.println(F("First disconnecting, then\r\nConnecting to WiFi-Network"));
+  deb_println(F("First disconnecting, then\r\nConnecting to WiFi-Network"), DEBUG_INFO);
   
   while (WiFi.status() != WL_DISCONNECTED)
   {
@@ -259,8 +274,8 @@ void setup()
   WiFi.begin(ssid, password);
 
   if (!WiFi.enableSTA(true))
-  {     
-    Serial.println("Connect failed.");
+  { 
+    deb_println(F("Connect failed. Rebooting..."), DEBUG_ERROR);   
     delay(10 * 1000);  // Reboot after 10 seconds
     ESP.restart(); 
   }
@@ -291,25 +306,31 @@ void setup()
   while (WiFi.status() != WL_CONNECTED)
   {  
     delay(100);
-    Serial.print((tryConnectCtr++ % 40 == 0) ? "\r\n" : "." );  
+    deb_print((tryConnectCtr++ % 40 == 0) ? "\r\n" : ".", DEBUG_NONE);
   }
-
-  Serial.print(F("\r\nGot Ip-Address: "));
-  Serial.println(WiFi.localIP());
-
+  deb_print(F("\r\nGot Ip-Address: "), DEBUG_NONE);
+  if (debug_level >= DEBUG_INFO)
+  {
+    Serial.print(WiFi.localIP()); 
+  }
+  deb_print("\r\n", DEBUG_NONE);
+  
   if (fritz.init())
   {
-    Serial.println(F("Initialization for FritzBox succeeded"));
+    deb_println(F("Initialization for FritzBox succeeded"), DEBUG_NONE); 
   }
   else
   {
-    Serial.println(F("Initialization for FritzBox failed, rebooting"));
+    deb_println(F("Initialization for FritzBox failed, rebooting"), DEBUG_NONE);
     delay(10 * 1000); // 10 seconds
     ESP.restart();  
   }
   fritz_SID = fritz.testSID();
   //If wanted, printout SID
-  //Serial.printf("Actual SID is: %s\r\n", fritz_SID.c_str());
+  if (debug_level >= DEBUG_INFO)
+  {
+      Serial.printf("Actual SID is: %s\r\n", fritz_SID.c_str());
+  }
 
   // if true: when the device connects to the server the sever will
   // send the last states of the switch to the device
@@ -330,39 +351,39 @@ void setup()
     SinricProSwitch& mySwitch = SinricPro[SWITCH_ID_1];
     // send powerstate event      
     mySwitch.sendPowerStateEvent(actualSocketState); // send the actual powerState to SinricPro server
-    Serial.println("PowerState of Fritz!Dect transmitted to server"); 
+    deb_println(F("PowerState of Fritz!Dect transmitted to server"), DEBUG_INFO);
   }
   
   // Set time interval for repeating commands
   millisAtLastFritzConnectTest = millis();
   millisBetwFritzConnectTests = 60 * 1000;  //to refresh fritz_SID every minute
-
-  //Serial.println("Setup ended");
+  deb_println(F("Setup completed, application is working..."), DEBUG_NONE);
 }
 
 void loop() 
 { 
   if (++loopCounter % 100000 == 0)   // Reset watchdog every 100000 th round
   {
-    //Serial.println("Reset WDG");   
+         
     #if WORK_WITH_WATCHDOG == 1
+      deb_println(F("Reset WDG"), DEBUG_INFO); 
       esp_task_wdt_reset();
     #endif
   }
   if ((millis() - millisAtLastFritzConnectTest) > millisBetwFritzConnectTests) // time interval expired?
   {
-     //Serial.println(F("Testing SID"));
+     deb_println(F("Testing SID"), DEBUG_INFO);     
      millisAtLastFritzConnectTest = millis();
      if (fritz_SID != fritz.testSID())
      {
         if (fritz.init())
         {
           fritz_SID = fritz.testSID();
-          Serial.println(F("Re-init for FritzBox succeeded"));
+          deb_println(F("Re-init for FritzBox succeeded"), DEBUG_INFO);          
         }
         else
         {
-          Serial.println(F("Re-init for FritzBox failed, rebooting"));
+          deb_println(F("Re-init for FritzBox failed, rebooting"), DEBUG_ERROR);         
           delay(10 * 1000); // 10 seconds
           ESP.restart();  
         }
@@ -413,15 +434,16 @@ bool sendThisPowerSensorData(RsPowerMeasureMgr &powerMeasureMgr)
   if (powerMeasureMgr.isAutoRepeatEnabled())
   {    
     powerMeasureMgr.DecrementAutoRepeatCounter(1000);
-    // RoSchmi
-    Serial.printf("RepeatCounter: %d\r\n", powerMeasureMgr.GetAutoRepeatCounter());
-    //Serial.println(powerMeasureMgr.GetAutoRepeatCounter());
+    char outStr[50] {0};
+    snprintf(outStr,sizeof(outStr), "RepeatCounter: %d", powerMeasureMgr.GetAutoRepeatCounter());
+    deb_println(outStr, DEBUG_INFO);
+    
     if (powerMeasureMgr.GetAutoRepeatCounter() <= 0)
     {
       powerMeasureMgr.SetPowerMeasureState(false);
       powerMeasureStateToggled = true;
       powerMeasureMgr.SetAutoRepeatCounter(SWITCH_READ_REPEAT_COUNT);
-      Serial.println("RepeatCounter was 0, stopping to repeat");
+      deb_println(F("RepeatCounter was 0, stopping to repeat"), DEBUG_INFO);          
     }
   }
   else
@@ -435,15 +457,16 @@ bool sendThisPowerSensorData(RsPowerMeasureMgr &powerMeasureMgr)
   // send measured data
   SinricProPowerSensor &myPowerSensor = SinricPro[powerMeasureMgr.GetPowerSensor_ID()];
   powerMeasure myPowerMeasure = powerMeasureMgr.GetPowerValues();
-
-  //Serial.println("sendPowerSensorEvent. Repeatcounter: %d\r\n", 
+ 
+  deb_println(F("sendPowerSensorEvent"), DEBUG_INFO);          
   
-  Serial.println("sendPowerSensorEvent");
   // RoSchmi: toggle GPIO_16 (for debugging)
   GPIO_16_State = !GPIO_16_State;
   digitalWrite(GPIOPin_16, GPIO_16_State);
-
-  //Serial.println(myPowerMeasure.power);
+  
+  char outStr[50] {0};
+  snprintf(outStr, sizeof(outStr), "Measured Power: %f", myPowerMeasure.power);
+  deb_println(outStr, DEBUG_VERBOSE);
   
   if (powerMeasureStateToggled)
   {
@@ -470,7 +493,7 @@ void handleButtonPress()
         SinricProSwitch& mySwitch = SinricPro[SWITCH_ID_1];
         // send powerstate event      
         mySwitch.sendPowerStateEvent(powerState1); // send the new powerState to SinricPro server
-        //Serial.println("(Switched manually via flashbutton)");        
+        deb_println(F("(Switched manually via flashbutton)"), DEBUG_INFO);             
       }    
     }     
   }
@@ -483,7 +506,9 @@ void handleButtonPress()
 bool onPowerState(String deviceId, bool &state)
 {
   bool returnResult = false;
-  //Serial.println( String(deviceId) + String(state ? " on" : " off"));
+  char outStr[50] {0};
+  snprintf(outStr, sizeof(outStr), "Received: %s State: %s", deviceId.c_str(), state ? " on" : " off");
+  deb_println(outStr, DEBUG_VERBOSE);
   
   if (deviceId == POWERSENSOR_ID_1)
   {
@@ -535,14 +560,19 @@ bool onPowerState1(const String &deviceId, bool state)
     {
       digitalWrite(relayPIN, state);      // set the new relay state
     }
-  
-    Serial.printf("Device 1 turned %s\r\n", state ? "on" : "off");
+    char outStr[50] {0};
+    snprintf(outStr, sizeof(outStr), "Device 1 turned %s\r\n", state ? "on" : "off");
+    deb_println(outStr, DEBUG_INFO);
+    
     powerState1 = state;
     flashButtonState.actState = state;    
   }
   else
   {
-    Serial.printf("Failed to turn Device 1 %s\r\n", state ? "on" : "off");   
+    char outStr[50] {0};
+    snprintf(outStr, sizeof(outStr), "Failed to turn Device 1 %s\r\n", state ? "on" : "off");
+    deb_println(outStr, DEBUG_ERROR);
+    
   }
   bool readPowerResult = true;
   
@@ -559,14 +589,15 @@ bool onPowerState1(const String &deviceId, bool state)
 
 bool onPowerState2(const String &deviceId, bool state)
 {
-  Serial.printf("Device 2 turned %s\r\n", state ? "on" : "off");
+  char outStr[50] {0};
+  snprintf(outStr, sizeof(outStr), "Device 2 turned %s\r\n", state ? "on" : "off");
+  deb_println(outStr, DEBUG_INFO); 
   powerState2 = state;
   
   bool atLeastOneSuccess = false;
   if (state == true)
   {
-    Serial.println("\r\nStarting Ring Test\r\n"); 
-    
+    deb_println(F("\r\nStarting Ring Test\r\n"), DEBUG_INFO);     
     if (RingPhone_1 == 1)
     {
       if(fritz.startRingTest(1))
@@ -590,11 +621,11 @@ bool onPowerState2(const String &deviceId, bool state)
     } 
     if (atLeastOneSuccess)
     {
-      Serial.println("Starting Ringtest was successful");
+      deb_println(F("Successfully started Ringtest"), DEBUG_INFO);
     }
     else
     {
-      Serial.println("Starting Ringtest failed");
+      deb_println(F("Failed to start Ringtest"), DEBUG_ERROR);  
     }    
   }
   else
@@ -622,13 +653,12 @@ bool onPowerState2(const String &deviceId, bool state)
     } 
     if (atLeastOneSuccess)
     {
-      Serial.println("Stoppinging Ringtest was successful");
+      deb_println(F("Successfully stopped Ringtest"), DEBUG_INFO);    
     }
     else
     {
-      Serial.println("Stopping Ringtest failed");
+      deb_println(F("Failed to stop Ringtest"), DEBUG_ERROR);      
     }  
-
   }
   return atLeastOneSuccess; // request handled properly ?
 
@@ -685,6 +715,43 @@ void print_reset_reason(RESET_REASON reason)
     case 16 : Serial.println ("RTCWDT_RTC_RESET");break;      /**<16, RTC Watch dog reset digital core and rtc module*/
     default : Serial.println ("NO_MEAN");
   }
+}
+
+/**************************************************************************/
+/*!
+    @brief  Debug-print. Only prints the message if the debug level is high enough.
+    @param    message
+                The message to be conditionally printed.
+    @param    level
+                The minimally required debug level.
+*/
+/**************************************************************************/
+void deb_print(String message, int level) {
+    if (Serial) {
+        if (debug_level >= level) {
+            Serial.print(message);
+            //Serial.flush();
+        }
+    }
+}
+
+/**************************************************************************/
+/*!
+    @brief  Same as deb_print, but with a new line at the end.
+            Only prints the message if the debug level is high enough.
+    @param    message
+                The message to be conditionally printed.
+    @param    level
+                The minimally required debug level.
+*/
+/**************************************************************************/
+void deb_println(String message, int level) {
+    if (Serial) {
+        if (debug_level >= level) {
+            Serial.println(message);
+            //Serial.flush();
+        }
+    }
 }
 
 

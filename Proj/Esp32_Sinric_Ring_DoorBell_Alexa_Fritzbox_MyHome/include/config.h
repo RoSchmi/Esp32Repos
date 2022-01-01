@@ -12,12 +12,20 @@
 
 // The credentials of your WiFi router has to be set in the file config_secret.h 
 
-// define whether a certain Frithphone shall ring. 0 = don't ring, 1 = ring
+// Different debug level, don't change the following 5 lines
+#define DEBUG_NONE 0        ///< Print no debug messages whatsoever
+#define DEBUG_ERROR 1       ///< Only print error messages
+#define DEBUG_WARNING 2     ///< Only print error and warning messages
+#define DEBUG_INFO 3        ///< Print error, warning and info messages
+#define DEBUG_VERBOSE 4     ///< Print all messages
+
+// Choose used debug level here
+#define SELECTED_DEBUG_LEVEL DEBUG_INFO
+
+// define whether a certain Fritzphone shall ring. 0 = don't ring, 1 = ring
 #define RingPhone_1 0
 #define RingPhone_2 1
 #define RingPhone_3 1
-
-#define SERIAL_PRINT 1                // 1 = yes, 0 = no. Select if Serial.print messages are printed
 
 #define POWER_MEASURE_READINTERVAL_MS  10 * 1000   // Read Fritz!DECT power sensor using this interval
 
@@ -27,16 +35,16 @@
 #define MEASURE_READ_REPEAT_COUNT 50  // When Power-Measure is set on, we read and actualize
                                       // n times (with POWER_MEASURE_READINTERVAL_MS) the measured power. >=1000 means: read infinitely                                      
 
-#define TRANSPORT_PROTOCOL 1      // 0 = http, 1 = https
-                                  // should be 1 for normal operation and 0 for testing
+#define TRANSPORT_PROTOCOL 0          // 0 = http, 1 = https
+                                      // should be 1 for normal operation and 0 for testing
 
-#define WORK_WITH_WATCHDOG 0               // 1 = yes, 0 = no, Watchdog is used (1) or not used (0)
-                                           // should be 1 for normal operation and 0 for testing
+#define WORK_WITH_WATCHDOG 0          // 1 = yes, 0 = no, Watchdog is used (1) or not used (0)
+                                      // should be 1 for normal operation and 0 for testing
 // not tested if it works
 #define USE_STATIC_IP 0                 // 1 = use static IpAddress, 0 = use DHCP
                                         // for static IP: Ip-addresses have to be set in the code
-// Zertifikat von FritzBox herunterladen
 
+// Zertifikat von FritzBox herunterladen
 // Klicken Sie in der Benutzeroberfläche der FRITZ!Box auf "Internet".
 // Klicken Sie im Menü "Internet" auf "Freigaben".
 // Klicken Sie auf die Registerkarte "FRITZ!Box-Dienste".
