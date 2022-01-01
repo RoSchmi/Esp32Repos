@@ -23,7 +23,9 @@ This App accomplishes a way to switch the power socket remotely over the interne
 
 #### To function 2:
 
-The 'Ring Video Doorbell Wired' is a doorbell consisting of ring-button, video camera with motion detector, microphone and speaker and a WiFi module to transfere videos to a cloud server of the producer. There are Apps for iOS and Android phones which connect to the cloud server and produce a 'ring-sound' when the button is pressed, can show a video taken from the doorbell camera and provide a talk-back functionality to talk with the visitor at the door remotely
+The 'Ring Video Doorbell Wired' is a doorbell consisting of ring-button, video camera with motion detector, microphone and speaker and a WiFi module to transfere videos to a cloud server of the producer. There are Apps for iOS and Android phones which connect to the cloud server and produce a 'ring-sound' when the button is pressed, can show a video taken from the doorbell camera and provide a talk-back functionality to talk with the visitor at the door remotely.
+
+https://ring.com/products/video-doorbell-wired
 
 Before you can start:
 Define WiFi-Credentials, FritzBox-Credentials and Sinric Pro Credentials in the file include/config_secrete.h (take 'config_secret_template.h' as a template)
