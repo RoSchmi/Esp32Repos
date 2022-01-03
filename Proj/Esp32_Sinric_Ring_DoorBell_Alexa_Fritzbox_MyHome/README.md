@@ -40,3 +40,34 @@ https://sinric.pro/de-index.html
 https://sinricpro.github.io/esp8266-esp32-sdk/index.html
 
 https://github.com/sinricpro
+
+#### Getting hands on:
+In the Fritzbox Web UI in 'System' -> FRITZ!Box-Benutzer' create a user and give rights to 'FRITZ!Box Einstellungen'.
+
+In tab 'Anmeldung im Heimnetz' select 'Anmeldung mit FRITZ!Box-Benutznamen und Kennwort' Note the user name and the password, they must be entered in the App 'Esp32_RingDoorBell_Alexa_Sinric_FritzPhone'
+
+Create a Sinric Pro Account and create a 'Switch' device with e.g. the following settings:
+
+Name: FritzPhoneRing
+
+Timer: Auto Aus (7sec)
+
+Note the Device_ID, the APP_Key and the App_Secret, they must be entered in the App 'Esp32_RingDoorBell_Alexa_Sinric_FritzPhone'
+
+Open the application 'Esp32_RingDoorBell_Alexa_Sinric_FritzPhone' in PlatformIO, apply the needed settings and passwords in the files include/config_secret.h (use config_secret_template.h as a template) and in include/config.h. Build the application and upload it to the Esp32 board. In the serial monitor you should see if the application runs properly.
+
+In the Sinric Pro Portal select 'Dashboard' on the left menue bar and switch the device (e.g.) FritzPhoneRing to 'On'. When everthing worked fine, the selected Dect-Phones should ring for a short time.
+
+Download the Sinric Pro mobile App from App Store or Google Play and test if everything works from the smartphone App as well.
+
+In the Alexa App on your smartphone on the menue bar select the right icon (three lines), then select 'Skills und Spiele'. Search for 'Sinric Pro' and add the Sinric Pro skill following the given advices.
+
+When everthing worked fine, you should now have a new switch (socket) device in the Alexa App. Switch it to 'On' in the Alexa App to seeif the Dect-phone ring.
+
+Now we come to the 'Ring Video Doorbell' part. To continue, the doorbell should be installed and setted up properly and should work properly with the 'Ring' smartphone App.
+
+Now in the Alexa App on your smartphone you should add the 'Ring Video Doorbell' Alexa skill and create an Alexa routine. In this routine you can add an action: set (e.g.) 'FritzPhoneRing' to 'On'
+
+Now hopefully the DECT-phones should ring when you press the doorbell.
+
+I hope that I didn't forget any important steps, if I did, please let me know.
