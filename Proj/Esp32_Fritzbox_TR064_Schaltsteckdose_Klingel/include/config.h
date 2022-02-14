@@ -16,7 +16,7 @@
 
 #define SERIAL_PRINT 1                     // 1 = yes, 0 = no. Select if Serial.print messages are printed 
 
-#define TRANSPORT_PROTOCOL 0        // 0 = http, 1 = https
+#define TRANSPORT_PROTOCOL 1        // 0 = http, 1 = https
                                     // should be 1 for normal operation and 0 for testing
                                     
 #define WORK_WITH_WATCHDOG 0               // 1 = yes, 0 = no, Watchdog is used (1) or not used (0)
