@@ -34,7 +34,7 @@ class FritzApi {
   public:
     
     //Constructor
-    FritzApi(const char* user, const char* password, const char* ip, Protocol protocol, WiFiClient client, HTTPClient * httpClient, X509Certificate pCertificate);
+    FritzApi(const char* user, const char* password, const char* ip, const char* ip4_std, Protocol protocol, WiFiClient client, HTTPClient * httpClient, X509Certificate pCertificate);
    
     ~FritzApi();
 
@@ -83,6 +83,8 @@ class FritzApi {
     const char* _user;
     const char* _pwd;
     const char* _ip;
+    const char* _ip4_std;
+
     String _sid;
 
     X509Certificate _certificate;

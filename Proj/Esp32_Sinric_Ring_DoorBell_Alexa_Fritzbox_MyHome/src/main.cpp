@@ -175,7 +175,7 @@ static HTTPClient * httpPtr = &http;
 
 uint64_t loopCounter = 0;
 String fritz_SID = "";
-FritzApi fritz((char *)FRITZ_USER, (char *)FRITZ_PASSWORD, FRITZ_IP_ADDRESS, protocol, wifi_client, httpPtr, myX509Certificate);
+FritzApi fritz((char *)FRITZ_USER, (char *)FRITZ_PASSWORD, FRITZ_IP_ADDRESS, FRITZ_STD_IP4_ADDRESS, protocol, wifi_client, httpPtr, myX509Certificate);
 
 // forward declaration
 bool sendThisPowerSensorData(RsPowerMeasureMgr &powerMeasureMgr);

@@ -11,11 +11,12 @@
 #include "RsHttpFritzApi.h"
 
 // constructor
-FritzApi::FritzApi(const char* user, const char* password, const char * ip, Protocol protocol, WiFiClient pClient, HTTPClient * pHttp, X509Certificate pCertificate) 
+FritzApi::FritzApi(const char* user, const char* password, const char * ip, const char* ip4_std, Protocol protocol, WiFiClient pClient, HTTPClient * pHttp, X509Certificate pCertificate) 
 { 
   _user = user;
   _pwd = password;
   _ip = ip;
+  _ip4_std = ip4_std;
   _protocol = protocol;
   _certificate = pCertificate;
   instHttp = pHttp;
@@ -39,6 +40,7 @@ FritzApi::~FritzApi(){
   _user="";
   _pwd="";
   _ip="";
+  _ip4_std = "";
   _protocol = Protocol::useHttps;
   _port = 443;
   instHttp = nullptr;
@@ -49,14 +51,15 @@ FritzApi::~FritzApi(){
 bool FritzApi::init() 
 {
   // Gets challenge and MD5 encoded Password hash
-  // response is <Challenge>-<MD5-Hash>
+  // response is <Challenge>-<MD5-Hash> 
   String response = getChallengeResponse();
   if (response == "")
   {
     return false;
   }
+  
   _sid = getSID(response);
-  //Serial.println("SID: " + _sid);
+  
   if (_sid == "") 
   {
     Serial.println("FRITZ_ERR_EMPTY_SID");
@@ -78,7 +81,7 @@ String FritzApi::getChallengeResponse()
   bool useTls = false;
   try
   {
-    instHttp->begin(client, String(_ip), 80, "/login_sid.lua", useTls);
+    instHttp->begin(client, String(_ip4_std), 80, "/login_sid.lua", useTls);   
   }
   catch(const std::exception& e)
   {
@@ -142,7 +145,6 @@ String FritzApi::getChallengeResponse()
 }
 
 
-
 String FritzApi::getSID(String response) 
 { 
   char augUrlPath[140] {0};
@@ -150,10 +152,13 @@ String FritzApi::getSID(String response)
   
   String protocolPrefix = _port == 80 ? "http://" : "https://";
   bool useTls = _port == 80 ? false : true;
+  
+  String fritz_address = useTls ? protocolPrefix + String(_ip): String(_ip4_std);
 
-  instHttp->begin(client, protocolPrefix + String(_ip), _port, augUrlPath, useTls);
+  instHttp->begin(client, fritz_address, _port, augUrlPath, useTls);
 
   int retCode = instHttp->GET();
+  
   if (retCode < 0) {
     instHttp->end();
 	  return "";
@@ -289,7 +294,9 @@ String FritzApi::executeRequest(String service, String command)
   String protocolPrefix = _port == 80 ? "http://" : "https://";
   bool useTls = _port == 80 ? false : true;
   
-  instHttp->begin(client, protocolPrefix + String(_ip), _port, aUrlPath, useTls);
+  String fritz_address = useTls ? protocolPrefix + String(_ip): String(_ip4_std);
+
+  instHttp->begin(client, fritz_address, _port, aUrlPath, useTls);
   
   int retCode = instHttp->GET();
   if (retCode < 0) 

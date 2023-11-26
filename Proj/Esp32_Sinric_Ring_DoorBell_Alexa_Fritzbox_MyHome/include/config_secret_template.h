@@ -9,6 +9,7 @@
 
 // FritzBox
 #define FRITZ_IP_ADDRESS "fritz.box"       // IP Address of FritzBox
+#define FRITZ_STD_IP4_ADDRESS "192.168.179.1"  // Standard IP4 Address of FritzBox
                                            // Change for your needs
 #define FRITZ_USER ""                      // FritzBox User (may be empty)
 #define FRITZ_PASSWORD "MySecretPassword"  // FritzBox Password
