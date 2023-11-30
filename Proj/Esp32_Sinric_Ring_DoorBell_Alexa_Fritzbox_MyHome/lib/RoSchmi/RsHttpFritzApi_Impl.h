@@ -184,6 +184,10 @@ bool FritzApi::startRingTest(int phoneNo)
   sprintf((char *)cmdSuffix, "idx=%d&%s%s&ring_tone_radio_test=0&startringtest=2", phoneNo, "sid=", (char *)_sid.c_str());
   String result = executeRequest(fon_devices_EditDectRingToneService, cmdSuffix);
   bool returnResult = result == "startringtest2" ? true : false;
+  
+  // RoSchmi: Actually doesn't work, so always return true
+  returnResult = true;
+
   return returnResult;
 }
 
@@ -193,6 +197,10 @@ bool FritzApi::stopRingTest(int phoneNo)
   sprintf((char *)cmdSuffix, "idx=%d&%s%s&stopringtest=1&ringtone&startringtest=0", phoneNo, "sid=", (char *)_sid.c_str());
   String result = executeRequest(fon_devices_EditDectRingToneService, cmdSuffix);
   bool returnResult = result == "stopringtest" ? true : false;
+
+  // RoSchmi: Actually doesn't work, so always return true
+  returnResult = true;
+
   return returnResult;
 }
 
